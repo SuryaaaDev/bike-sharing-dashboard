@@ -46,4 +46,4 @@ ax2.set_title("Rata-rata Jumlah Peminjaman: Hari Kerja vs Akhir Pekan")
 st.pyplot(fig2)
 
 st.markdown("---")
-st.markdown("📌 Data berasal dari [Bike Sharing Dataset]")
+st.markdown("📌 Data berasal dari [Bike Sharing Dataset] https://www.kaggle.com/datasets/lakshmi25npathi/bike-sharing-dataset")
