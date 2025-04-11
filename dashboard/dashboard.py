@@ -56,4 +56,4 @@ st.pyplot(fig2)
 
 st.markdown("---")
 st.markdown("📌 Data difilter berdasarkan musim, cuaca, dan tanggal yang dipilih.")
-st.markdown("Sumber data: [Bike Sharing Dataset - UCI](https://archive.ics.uci.edu/ml/datasets/bike+sharing+dataset)")
+st.markdown("Sumber data: [Bike Sharing Dataset](https://www.kaggle.com/datasets/lakshmi25npathi/bike-sharing-dataset)")
