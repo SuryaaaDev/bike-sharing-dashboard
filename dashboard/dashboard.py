@@ -4,46 +4,39 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Konfigurasi halaman
-st.set_page_config(page_title="Bike Sharing Dashboard", layout="wide")
+st.set_page_config(page_title="Dashboard Interaktif Bike Sharing", layout="centered")
 
-st.title("🚲 Bike Sharing Dashboard")
-st.markdown("Visualisasi interaktif untuk menjawab pertanyaan analisis seputar peminjaman sepeda.")
+st.title("🚲 Dashboard Interaktif Peminjaman Sepeda")
+st.markdown("Gunakan filter di bawah untuk mengeksplorasi jumlah peminjaman sepeda berdasarkan musim dan cuaca.")
 
-# Load data
 @st.cache_data
 def load_data():
-    return pd.read_csv("dashboard/main_data.csv")
+    data = pd.read_csv("dashboard/main_data.csv")
+    data['season'] = data['season'].map({1: "Spring", 2: "Summer", 3: "Fall", 4: "Winter"})
+    data['weathersit'] = data['weathersit'].map({
+        1: "Clear/Few clouds",
+        2: "Mist + Cloudy",
+        3: "Light Snow/Light Rain",
+        4: "Heavy Rain/Snow"
+    })
+    return data
 
 data = load_data()
 
-# Preprocessing sederhana
-data['dteday'] = pd.to_datetime(data['dteday'])
-data['season'] = data['season'].map({1: "Spring", 2: "Summer", 3: "Fall", 4: "Winter"})
-data['weekday'] = data['weekday'].map({
-    0: "Sunday", 1: "Monday", 2: "Tuesday", 3: "Wednesday",
-    4: "Thursday", 5: "Friday", 6: "Saturday"
-})
-data['workingday'] = data['workingday'].map({0: "Weekend/Holiday", 1: "Working Day"})
+# Filter interaktif
+selected_season = st.selectbox("Pilih Musim", options=data['season'].unique())
+selected_weather = st.multiselect("Pilih Kondisi Cuaca", options=data['weathersit'].unique(), default=data['weathersit'].unique())
 
-# Visualisasi 1: Pengaruh Musim terhadap Jumlah Peminjaman
-st.subheader("📅 Jumlah Peminjaman Berdasarkan Musim")
-fig1, ax1 = plt.subplots()
-sns.boxplot(data=data, x='season', y='cnt', palette='Set2', ax=ax1)
-ax1.set_xlabel("Musim")
-ax1.set_ylabel("Jumlah Peminjaman")
-ax1.set_title("Distribusi Jumlah Peminjaman per Musim")
-st.pyplot(fig1)
+filtered_data = data[(data['season'] == selected_season) & (data['weathersit'].isin(selected_weather))]
 
-# Visualisasi 2: Perbedaan Hari Kerja vs Akhir Pekan
-st.subheader("🗓️ Perbandingan Jumlah Peminjaman Hari Kerja vs Akhir Pekan")
-avg_cnt = data.groupby('workingday')['cnt'].mean().reset_index()
-fig2, ax2 = plt.subplots()
-sns.barplot(data=avg_cnt, x='workingday', y='cnt', palette='pastel', ax=ax2)
-ax2.set_xlabel("Tipe Hari")
-ax2.set_ylabel("Rata-rata Jumlah Peminjaman")
-ax2.set_title("Rata-rata Jumlah Peminjaman: Hari Kerja vs Akhir Pekan")
-st.pyplot(fig2)
+# Visualisasi
+fig, ax = plt.subplots()
+sns.lineplot(data=filtered_data, x='dteday', y='cnt', marker='o', ax=ax)
+ax.set_title(f"Jumlah Peminjaman Sepeda pada Musim {selected_season} dan Cuaca Tertentu")
+ax.set_xlabel("Tanggal")
+ax.set_ylabel("Jumlah Peminjaman")
+plt.xticks(rotation=45)
+st.pyplot(fig)
 
-st.markdown("---")
-st.markdown("📌 Data berasal dari [Bike Sharing Dataset] https://www.kaggle.com/datasets/lakshmi25npathi/bike-sharing-dataset")
+st.markdown("📌 Data difilter berdasarkan pilihan musim dan kondisi cuaca.")
+st.markdown("Sumber data: [Bike Sharing Dataset - UCI](https://archive.ics.uci.edu/ml/datasets/bike+sharing+dataset)")
